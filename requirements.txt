@@ -31,3 +31,4 @@ numexpr
 huggingface_hub
 streamlit
 loguru
+singleton-decorator
