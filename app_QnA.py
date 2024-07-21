@@ -16,6 +16,8 @@ os.environ["LANGCHAIN_PROJECT"]= "QnA Bot"
 ## #Title of the app
 st.title("Enhanced Q&A Chatbot With OpenAI")
 
+st.sidebar.title("Settings")
+
 ## Select the OpenAI model
 llm=st.sidebar.selectbox("Select Open Source model",["mistral"])
 
