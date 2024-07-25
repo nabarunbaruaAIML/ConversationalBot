@@ -36,7 +36,7 @@ user_input=st.text_input("Enter your query from the Document")
 
 if user_input:
     inst = MistralRAG()
-    retriever=st.session_state.db.as_retriever()
+    retriever=st.session_state.db.as_retriever() # You have to show different was of Retriver like K=1 or similarity etc
     response = inst.get_answer(retriever,question=user_input,temperature=temperature,top_p=top_p,top_k=top_k)
     st.write(response['answer'])
     ## With a streamlit expander
