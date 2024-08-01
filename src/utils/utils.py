@@ -13,6 +13,16 @@ def get_mistral_RAG_prompt_template()->ChatPromptTemplate:
     prompt=ChatPromptTemplate.from_template("""<s>[INST]You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, say that you don't know. Use three sentences maximum and keep the answer concise.\n\nContext:{context} Question:{input}[/INST]""")
     return prompt
 
+def get_mistral_chat_aware_prompt_template()->ChatPromptTemplate:
+    chat_aware_Prompt_template = "<s>[INST]Given a chat history and the latest user question which might reference context in the chat history, formulate a standalone question which can be understood without the chat history. Do NOT answer the question, just reformulate it if needed and otherwise return it as is.\n\nChat History:{chat_history} Question:{input}[/INST]"
+    chat_aware_Prompt=ChatPromptTemplate.from_template(chat_aware_Prompt_template )
+    return chat_aware_Prompt
+
+def get_mistral_RAG_chat_aware_prompt_template()->ChatPromptTemplate:
+    promp_tmp = "<s>[INST]You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, say that you don't know. Use three sentences maximum and keep the answer concise.\n\nContext:{context} Chat History:{chat_history} Question:{input}[/INST]"
+    prompt = ChatPromptTemplate.from_template(promp_tmp)
+    return prompt
+
 def get_vector_embedding():
     if "db" not in st.session_state:
         st.session_state.embedding = OllamaEmbeddings(model='mxbai-embed-large')
@@ -24,3 +34,23 @@ def get_vector_embedding():
         st.session_state.final_documents=st.session_state.text_splitter.split_documents(st.session_state.docs)
         st.session_state.db = Chroma.from_documents(documents=st.session_state.final_documents,embedding=st.session_state.embedding,persist_directory='artifacts/Online',collection_name='Online_Upload')
         # st.write('Vector Store Prepared')
+        retriever=st.session_state.db.as_retriever()
+        st.session_state.retriever = retriever
+
+def get_vector_embedding1():
+    if "db" not in st.session_state:
+        
+        st.session_state.embedding = OllamaEmbeddings(model='mxbai-embed-large')
+        ## Data Ingestion step
+        st.session_state.loader=PyPDFDirectoryLoader("artifacts/Online") 
+        ## Document Loading
+        st.session_state.docs=st.session_state.loader.load() 
+        st.session_state.text_splitter=RecursiveCharacterTextSplitter(chunk_size=1000,chunk_overlap=200)
+        st.session_state.final_documents=st.session_state.text_splitter.split_documents(st.session_state.docs)
+        st.session_state.db = Chroma.from_documents(documents=st.session_state.final_documents,embedding=st.session_state.embedding,persist_directory='artifacts/Online',collection_name='Online_Upload')
+        # st.write('Vector Store Prepared')
+        retriever=st.session_state.db.as_retriever()
+        st.session_state.retriever = retriever
+    else:
+        retriever=st.session_state.retriever
+    return retriever
